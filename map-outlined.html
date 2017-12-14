@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>NYS Counties Outline Map</title>
+        
+        <link rel="stylesheet" href="css/generic-styles.css"></link>
+        <link rel="stylesheet" href="css/generic-map-styles.css"></link>
+        <link rel="stylesheet" href="css/generic-print-styles.css"></link>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.0/raphael-min.js" charset="utf-8"></script>
+
+        <script src="js/maps/jquery.mapael.js" charset="utf-8"></script>
+        <script src="js/maps/generic_nys_counties_map.js" charset="utf-8"></script>
+        
+        <script type="text/javascript">
+
+            // selected options from select lists for Population
+            var selectedPalette; 
+
+            // labels for select listfor Population
+            var lblPalette = $('<label for="sbPalette">Select Map Colors: </label>');
+
+            // initializes indexes for select list to 0
+            var paletteIndex = 0;
+
+            // sets default index for each select list on initial page load
+            var paletteIndex2 = 0;
+
+            // wrap Javascript in anonymous function for closure
+            $(function () {		
+            
+            // Creates palette array for select list  
+                    paletteArray = ["paletteLightBlue", "LightBlue", "paletteDarkBlue", "DarkBlue", "paletteGreen", "Green", "paletteBrown", "Brown", "paletteRed", "Red", "paletteYellow", "Yellow", "paletteGray", "Gray"];
+                    
+                    createSelectList(paletteArray, "sbPalette");
+                    
+                    $('#sbPalette').prop('selectedIndex', paletteIndex2);
+                    selectedPalette = $('#sbPalette').val();
+                    
+                      // call initializePage function
+                    initializePage();
+            
+            function createSelectList (sBoxElements, sbID) {
+    
+                    // Create the selection element.
+                    var sel = $('<select class="sBoxes" id="'+sbID+'"></select>');
+
+                    // loops through the array of options.
+                    for (index = 0; index < sBoxElements.length; index += 2) {
+                        // Append the option to the selection box.
+                        sel.append('<option value='+sBoxElements[index]+'>'+sBoxElements[index+1]+'</option>');
+                    }
+
+                    // Append the selection box to the correct position within fieldset.
+                    $(sel).insertAfter('legend');
+                }
+
+                function initializePage() {	
+
+                    // Builds top of page with select lists and labels
+                    $(lblPalette).insertBefore('#sbPalette');
+
+                    // Re-queries to rebuild select list based on change in Palette selection.
+                    $('#sbPalette').change(function() {
+                        preDraw();        
+                    }); // Closes out Palette change function  
+
+                    // Calls preDraw function to print the page heading on initial page load
+                    preDraw();	
+                }
+
+                function preDraw() {
+                    selectedPalette = $('#sbPalette').val();   
+                    draw();
+                }
+    
+                function draw() { 
+                
+                    // define color schemes based on select list option
+                    var color;
+                    var mapStrokeColor = "#ced8d0";
+                    var mapTextColor = "#ffffff";
+                    var paletteYellow = "#FFF9C4";
+                    var paletteDarkBlue = "#000066";
+                    var paletteLightBlue = "#bdd7e7";
+                    var paletteBrown = "#8a5711";
+                    var paletteRed = "#ff3f00";
+                    var paletteGray = "#999999";
+                    var paletteGreen = "#566727";
+                    if (selectedPalette == "paletteDarkBlue") {
+                        color = paletteDarkBlue;
+                    }
+                    else if (selectedPalette == "paletteLightBlue") {
+                        color = paletteLightBlue;
+                        mapStrokeColor = "#000000"
+                        mapTextColor = "#000000";
+                    }
+                    else if (selectedPalette == "paletteBrown") {
+                        color = paletteBrown;
+                    }
+                    else if (selectedPalette == "paletteRed") {
+                        color = paletteRed;
+                    }
+                    else if (selectedPalette == "paletteGray") {
+                        color = paletteGray;
+                    }
+                    else if (selectedPalette == "paletteGreen") {
+                        color = paletteGreen;
+                    }
+                    else {
+                        color = paletteYellow;  
+                    }
+ 
+                    
+                    // Inserts selected year into where clause in query and creates h1 and h2 headings
+
+                    $('h1').html('New York State Map: Counties Outlined');                                       
+
+                        
+                        /**
+                         * @ Summary Draws this particular mapael map
+                         *
+                         * Some colors used in the fill attributes are taken from the 
+                         * color-hex palettes at http://www.color-hex.com/color-palettes/
+                         */
+            
+                        $(".mapcontainer").mapael({
+                            map: {
+                                name: "generic_nys_counties_map",
+                                
+                                defaultPlot: {
+                                    size: 4,
+                                    eventHandlers: {
+                                        mouseover: function (e, id, mapElem, textElem, elemOptions) {
+                                            if (typeof elemOptions.myText != 'undefined') {
+                                                $('.myText span').html(elemOptions.myText).css({display: 'none'}).fadeIn('slow');
+                                            }
+                                        }
+                                    }
+                                },
+                                
+                                defaultArea: {
+                                 
+                                    attrs: {
+                                        fill: color,
+                                        stroke: mapStrokeColor,
+                                        "stroke-width": 1
+                                    },
+                                    text: {                                   
+                                        attrs: {
+                                            fill: mapTextColor
+                                        },
+                                    }
+                                },
+                                
+                                zoom: {
+                                    enabled: true,
+                                    maxLevel: 50
+                                }                            
+                            },
+                                                      
+                        }); // close out $(".mapcontainer").mapael)
+
+                        
+                } // close out draw function
+                
+
+          
+            }); // close out containing closure function
+            
+        </script>
+    </head>
+
+    <body>
+        <h1></h1>
+        <div id="links" style="margin-top:-30px;float:right"> &lt; <a href="maps.html">Back to Portal Page</a></div>
+        <fieldset style="clear:both;;margin-bottom: 12px; background-color: #f2f2f2">
+            <legend>Filter map by colors</legend>
+            <span id="return"/>
+        </fieldset>
+
+        <div class="container">
+
+
+            <div class="mapcontainer">
+
+                <div class="map">
+                    <span>Alternative content for the map</span>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>

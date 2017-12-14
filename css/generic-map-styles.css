@@ -1,0 +1,96 @@
+/* ==========================================================================
+   General Map Container Styles 
+   ========================================================================== */
+.container {
+  max-width: 800px;
+  margin: auto;
+  border: solid black 1px;
+}
+/* ==========================================================================
+   Specific mapael css class are below 'mapael' class is added by plugin 
+   ========================================================================== */
+.mapael .map {
+  background-color: #FAF0E6;
+  padding: 5px;
+  overflow: hidden;
+  position: relative;    /* keep tooltip near hover point */
+}
+
+/* Override the default svg background of #FFFFFF in doh16-styles.css */
+.mapael .map svg{
+  background-color:#FAF0E6;
+}
+
+.mapael .mapTooltip {
+  position: absolute;
+  background-color: #474c4b;
+  moz-opacity: 0.70;
+  opacity: 1.00;
+  filter: alpha(opacity=70);
+  border-radius: 10px;
+  padding: 10px;
+  z-index: 1000;
+  max-width: 200px;
+  display: none;
+  color: #ff8533;
+}	
+
+/* ==========================================================================
+   Zoom Button
+   ========================================================================== */
+.mapael .zoomButton {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  color: #000;
+  width: 15px;
+  height: 15px;
+  line-height: 15px;
+  text-align: center;
+  border-radius: 3px;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  font-weight: bold;
+  left: 10px;
+  -webkit-user-select: none;
+  -khtml-user-select : none;
+  -moz-user-select: none;
+  -o-user-select : none;
+  user-select: none;
+}
+
+/* Reset Zoom button first */
+.mapael .zoomReset {
+  top: 10px;
+}
+
+/* Then Zoom In button */
+.mapael .zoomIn {
+  top: 30px;
+}
+
+/* Then Zoom Out button */
+.mapael .zoomOut {
+  top: 50px;
+}
+
+/* ==========================================================================
+   Text and legend boxes above the map display
+   ========================================================================== */
+.myText {
+  background-color: #474c4b;
+  height: 35px;
+  padding: 10px;
+  color: #fff;
+  overflow: auto;
+}
+
+.myText2 {
+  background-color: #e6faff;
+  height: 50px;
+  padding: 10px;
+}
+
+.myText2 svg {
+  background-color: #e6faff;
+}

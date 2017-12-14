@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>NYS Counties Outline Map with Labels</title>
+        
+        <link rel="stylesheet" href="css/generic-styles.css"></link>
+        <link rel="stylesheet" href="css/generic-map-styles.css"></link>
+        <link rel="stylesheet" href="css/generic-print-styles.css"></link>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.0/raphael-min.js" charset="utf-8"></script>
+
+        <script src="js/maps/jquery.mapael.js" charset="utf-8"></script>
+        <script src="js/maps/generic_nys_counties_map.js" charset="utf-8"></script>
+        
+        <script type="text/javascript">
+
+            // selected options from select lists for Population
+            var selectedPalette; 
+
+            // labels for select listfor Population
+            var lblPalette = $('<label for="sbPalette">Select Map Colors: </label>');
+
+            // initializes indexes for select list to 0
+            var paletteIndex = 0;
+
+            // sets default index for each select list on initial page load
+            var paletteIndex2 = 0;
+
+            // wrap Javascript in anonymous function for closure
+            $(function () {		
+            
+            // Creates palette array for select list  
+                    paletteArray = ["paletteLightBlue", "LightBlue", "paletteDarkBlue", "DarkBlue", "paletteGreen", "Green", "paletteBrown", "Brown", "paletteRed", "Red", "paletteYellow", "Yellow", "paletteGray", "Gray"];
+                    
+                    createSelectList(paletteArray, "sbPalette");
+                    
+                    $('#sbPalette').prop('selectedIndex', paletteIndex2);
+                    selectedPalette = $('#sbPalette').val();
+                    
+                      // call initializePage function
+                    initializePage();
+            
+            function createSelectList (sBoxElements, sbID) {
+    
+                    // Create the selection element.
+                    var sel = $('<select class="sBoxes" id="'+sbID+'"></select>');
+
+                    // loops through the array of options.
+                    for (index = 0; index < sBoxElements.length; index += 2) {
+                        // Append the option to the selection box.
+                        sel.append('<option value='+sBoxElements[index]+'>'+sBoxElements[index+1]+'</option>');
+                    }
+
+                    // Append the selection box to the correct position within fieldset.
+                    $(sel).insertAfter('legend');
+                }
+
+                function initializePage() {	
+
+                    // Builds top of page with select lists and labels
+                    $(lblPalette).insertBefore('#sbPalette');
+
+                    // Re-queries to rebuild select list based on change in Palette selection.
+                    $('#sbPalette').change(function() {
+                        preDraw();        
+                    }); // Closes out Palette change function  
+
+                    // Calls preDraw function to print the page heading on initial page load
+                    preDraw();	
+                }
+
+                function preDraw() {
+                    selectedPalette = $('#sbPalette').val();   
+                    draw();
+                }
+    
+                function draw() { 
+                
+                    // define color schemes based on select list option
+                    var color;
+                    var mapStrokeColor = "#ced8d0";
+                    var mapTextColor = "#ffffff";
+                    var paletteYellow = "#FFF9C4";
+                    var paletteDarkBlue = "#000066";
+                    var paletteLightBlue = "#bdd7e7";
+                    var paletteBrown = "#8a5711";
+                    var paletteRed = "#ff3f00";
+                    var paletteGray = "#999999";
+                    var paletteGreen = "#566727";
+                    if (selectedPalette == "paletteDarkBlue") {
+                        color = paletteDarkBlue;
+                    }
+                    else if (selectedPalette == "paletteLightBlue") {
+                        color = paletteLightBlue;
+                        mapStrokeColor = "#000000"
+                        mapTextColor = "#000000";
+                    }
+                    else if (selectedPalette == "paletteBrown") {
+                        color = paletteBrown;
+                    }
+                    else if (selectedPalette == "paletteRed") {
+                        color = paletteRed;
+                    }
+                    else if (selectedPalette == "paletteGray") {
+                        color = paletteGray;
+                    }
+                    else if (selectedPalette == "paletteGreen") {
+                        color = paletteGreen;
+                    }
+                    else {
+                        color = paletteYellow;
+                        mapStrokeColor = "#000000"
+                        mapTextColor = "#000000";                        
+                    }
+ 
+                    
+                    // Inserts selected year into where clause in query and creates h1 and h2 headings
+
+                    $('h1').html('New York State Map: Counties Outlined with Labels');                                       
+
+                        
+                        /**
+                         * @ Summary Draws this particular mapael map
+                         *
+                         * Some colors used in the fill attributes are taken from the 
+                         * color-hex palettes at http://www.color-hex.com/color-palettes/
+                         */
+            
+                        $(".mapcontainer").mapael({
+                            map: {
+                                name: "generic_nys_counties_map",
+                                
+                                defaultPlot: {
+                                    size: 4,
+                                    eventHandlers: {
+                                        mouseover: function (e, id, mapElem, textElem, elemOptions) {
+                                            if (typeof elemOptions.myText != 'undefined') {
+                                                $('.myText span').html(elemOptions.myText).css({display: 'none'}).fadeIn('slow');
+                                            }
+                                        }
+                                    }
+                                },
+                                
+                                defaultArea: {
+                                 
+                                    attrs: {
+                                        fill: color,
+                                        stroke: mapStrokeColor,
+                                        "stroke-width": 1
+                                    },
+                                    text: {                                   
+                                        attrs: {
+                                            fill: mapTextColor
+                                        },
+                                    }
+                                },
+                                
+                                zoom: {
+                                    enabled: true,
+                                    maxLevel: 50
+                                }                            
+                            },
+                            
+                            areas: {
+                                "Albany": {
+                                    text: {content: "Albany", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Albany</span>"}
+                                },
+                                "Allegany": {
+                                    text: {content: "Allegany", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Allegany</span>"}
+                                },
+                                "Bronx": {
+                                    text: {content: "Broome", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Bronx</span>"}
+                                },
+                                "Broome": {
+                                    text: {content: "Broome", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Broome</span>"}
+                                },
+                                "Cattaraugus": {
+                                    text: {content: "Cattaraugus", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Cattaraugus</span>"}
+                                },
+                                "Cayuga": {
+                                    text: {content: "Cayuga", attrs: {"font-size": 6, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Cayuga</span>"}
+                                },
+                                "Chautauqua": {
+                                    text: {content: "Chautauqua", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Chautauqua</span>"}
+                                },
+                                "Chemung": {
+                                    text: {content: "Chemung", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Chemung</span>"}
+                                },
+                                "Chenango": {
+                                    text: {content: "Chenango", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Chenango</span>"}
+                                },
+                                "Clinton": {
+                                    text: {content: "Clinton", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Clinton </span>"}
+                                },
+                                "Columbia": {
+                                    text: {content: "Columbia", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Columbia</span>"}
+                                },
+                                "Cortland": {
+                                    text: {content: "Cortland", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Cortland</span>"}
+                                },
+                                "Delaware": {
+                                    text: {content: "Delaware", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Delaware</span>"}
+                                },
+                                "Dutchess": {
+                                    text: {content: "Dutchess", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Dutchess</span>"}
+                                },
+                                "Erie": {
+                                    text: {content: "Erie", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Erie</span>"}
+                                },
+                                "Essex": {
+                                    text: {content: "Essex", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Essex </span>"}
+                                },
+                                "Franklin": {
+                                    text: {content: "Franklin", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Franklin</span>"}
+                                },
+                                "Fulton": {
+                                    text: {content: "Fulton", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Fulton </span>"}
+                                },
+                                "Genesee": {
+                                    text: {content: "Genesee", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Genesee</span>"}
+                                },
+                                 "Greene": {
+                                    text: {content: "Greene", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Greene</span>"}
+                                },
+                                "Hamilton": {
+                                    text: {content: "Hamilton", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Hamilton </span>"}
+                                },
+                                "Herkimer": {
+                                    text: {content: "Herkimer", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Herkimer </span>"}
+                                },
+                                "Jefferson": {
+                                    text: {content: "Jefferson", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Jefferson</span>"}
+                                },
+                                "Kings": {
+                                    text: {content: "Kings", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Kings</span>"}
+                                },
+                                "Lewis": {
+                                    text: {content: "Lewis", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Lewis </span>"}
+                                },
+                                "Livingston": {
+                                    text: {content: "Livingston", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Livingston</span>"}
+                                },
+                                "Madison": {
+                                    text: {content: "Madison", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Madison</span>"}
+                                },
+                                "Monroe": {
+                                    text: {content: "Monroe", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Monroe</span>"}
+                                },
+                                "Montgomery": {
+                                    text: {content: "Montgomery", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Montgomery</span>"}
+                                },
+                                "Nassau": {
+                                    text: {content: "Nassau", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Nassau</span>"}
+                                },
+                                "New York": {
+                                    text: {content: "New York", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">New York</span>"}
+                                },
+                                "Niagara": {
+                                    text: {content: "Niagara", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Niagara</span>"}
+                                },
+                                "Oneida": {
+                                    text: {content: "Oneida", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Oneida</span>"}
+                                },
+                                "Onondaga": {
+                                    text: {content: "Onondago", attrs: {"font-size": 6, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Onondaga</span>"}
+                                },
+                                "Ontario": {
+                                    text: {content: "Ontario", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Ontario</span>"}
+                                },
+                                "Orange": {
+                                    text: {content: "Orange", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Orange</span>"}
+                                },
+                                "Orleans": {
+                                    text: {content: "Orleans", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Orleans</span>"}
+                                },
+                                "Oswego": {
+                                    text: {content: "Oswego", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Oswego</span>"}
+                                },
+                                "Otsego": {
+                                    text: {content: "Otsego", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Otsego</span>"}
+                                },
+                                "Putnam": {
+                                    text: {content: "Putnam", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Putnam</span>"}
+                                },
+                                "Queens": {
+                                    text: {content: "Queens", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Queens</span>"}
+                                },
+                                 "Rensselaer": {
+                                    text: {content: "Rensselaer", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Rensselaer</span>"}
+                                },
+                                "Richmond": {
+                                    text: {content: "Richmond", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Richmond</span>"}
+                                },
+                                "Rockland": {
+                                    text: {content: "Rockland", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Rockland</span>"}
+                                },
+                                "Saratoga": {
+                                    text: {content: "Saratoga ", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Saratoga</span>"}
+                                },
+                                "Schenectady": {
+                                    text: {content: "Schenectady", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Schenectady</span>"}
+                                },
+                                "Schoharie": {
+                                    text: {content: "Schoharie", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Schoharie</span>"}
+                                },
+                                "Schuyler": {
+                                    text: {content: "Schuyler", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Schuyler</span>"}
+                                },
+                                "Seneca": {
+                                    text: {content: "Seneca", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Seneca</span>"}
+                                },
+                                "Steuben": {
+                                    text: {content: "Steuben", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Steuben</span>"}
+                                },
+                                "St Lawrence": {
+                                    text: {content: "St. Lawrence", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">St Lawrence</span>"}
+                                },
+                                "Suffolk": {
+                                    text: {content: "Suffolk", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Suffolk</span>"}
+                                },
+                                "Sullivan": {
+                                    text: {content: "Sullivan", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Sullivan</span>"}
+                                },
+                                "Tioga": {
+                                    text: {content: "Tioga", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Tioga</span>"}
+                                },
+                                "Tompkins": {
+                                    text: {content: "Tompkins", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Tompkins</span>"}
+                                },
+                                "Ulster": {
+                                    text: {content: "Ulster", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Ulster</span>"}
+                                },
+                                "Warren": {
+                                    text: {content: "Warren", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Warren</span>"}
+                                },
+                                "Washington": {
+                                    text: {content: "Washington", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Washington</span>"}
+                                },
+                                "Wayne": {
+                                    text: {content: "Wayne", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Wayne</span>"}
+                                },
+                                "Westchester": {
+                                    text: {content: "West-Chester", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">West-Chester</span>"}
+                                },
+                                "Wyoming": {
+                                    text: {content: "Wyoming", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Wyoming </span>"}
+                                },
+                                "Yates": {
+                                    text: {content: "Yates", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Yates</span>"}
+                                }                        
+                                
+                           }  // close out areas of individual counties
+                            
+                            
+                            
+
+                        }); // close out $(".mapcontainer").mapael)
+
+                        
+                } // close out draw function
+                
+
+          
+            }); // close out containing closure function
+            
+        </script>
+    </head>
+
+    <body>
+        <h1></h1>
+        <div id="links" style="margin-top:-30px;float:right"> &lt; <a href="maps.html">Back to Portal Page</a></div>
+        <fieldset style="clear:both;;margin-bottom: 12px; background-color: #f2f2f2">
+            <legend>Filter map by colors</legend>
+            <span id="return"/>
+        </fieldset>
+
+        <div class="container">
+
+
+            <div class="mapcontainer">
+
+                <div class="map">
+                    <span>Alternative content for the map</span>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>

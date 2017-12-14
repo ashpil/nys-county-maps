@@ -1,0 +1,49 @@
+/* FORCE LANDSCAPE 
+@media print {@page {size: landscape} */ 
+@media print { 
+    div.nys-global-header  {
+        display:none;
+    }
+    select,label,button,.noprint,.selections,#hideshow_help{
+        display:none;
+    }
+    .printonly {
+        display:block;
+    }
+    
+    fieldset, #linkorig , #maplink, .myText, .zoomButton{
+      display:none;
+    }    
+    
+    #legend {
+        clear:both;
+        float: none !important; 
+        page-break-after: always;
+    }
+     #div2 {
+        clear:both;
+        float: none !important; 
+        width:100% !important;  
+    }
+
+   
+   table {
+    border-collapse: collapse;
+    }
+
+    table, th, td {
+    border: 1px solid black;
+    }
+   
+    #table1, #table2, #table3 {
+      clear:both;
+      display:block; 
+      float:none;      
+    }
+    
+    div#table>div>div.something:nth-of-type(4n) {
+      page-break-after: always;
+    }
+    
+
+}

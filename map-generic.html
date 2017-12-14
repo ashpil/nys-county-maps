@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>NYS Counties Estimated Population Map</title>
+        
+        <link rel="stylesheet" href="css/generic-styles.css"></link>
+        <link rel="stylesheet" href="css/generic-map-styles.css"></link>
+        <link rel="stylesheet" href="css/generic-print-styles.css"></link>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.0/raphael-min.js" charset="utf-8"></script>
+
+        <script src="js/maps/jquery.mapael.js" charset="utf-8"></script>
+        <script src="js/maps/generic_nys_counties_map.js" charset="utf-8"></script>
+        
+        <script type="text/javascript">
+
+            // selected options from select lists for Population
+            var selectedPalette; 
+
+            // labels for select listfor Population
+            var lblPalette = $('<label for="sbPalette">Select Map Colors: </label>');
+
+            // initializes indexes for select list to 0
+            var paletteIndex = 0;
+
+            // sets default index for each select list on initial page load
+            var paletteIndex2 = 0;
+
+            // wrap Javascript in anonymous function for closure
+            $(function () {		
+            
+            // Creates palette array for select list  
+                    paletteArray = ["paletteLightBlue", "LightBlue", "paletteDarkBlue", "DarkBlue", "paletteGreen", "Green", "paletteBrown", "Brown", "paletteRedYellow", "RedYellow", "paletteGray", "Gray"];
+                    
+                    createSelectList(paletteArray, "sbPalette");
+                    
+                    $('#sbPalette').prop('selectedIndex', paletteIndex2);
+                    selectedPalette = $('#sbPalette').val();
+                    
+                      // call initializePage function
+                    initializePage();
+            
+            function createSelectList (sBoxElements, sbID) {
+    
+                    // Create the selection element.
+                    var sel = $('<select class="sBoxes" id="'+sbID+'"></select>');
+
+                    // loops through the array of options.
+                    for (index = 0; index < sBoxElements.length; index += 2) {
+                        // Append the option to the selection box.
+                        sel.append('<option value='+sBoxElements[index]+'>'+sBoxElements[index+1]+'</option>');
+                    }
+
+                    // Append the selection box to the correct position within fieldset.
+                    $(sel).insertAfter('legend');
+                }
+
+                function initializePage() {	
+
+                    // Builds top of page with select lists and labels
+                    $(lblPalette).insertBefore('#sbPalette');
+
+                    // Re-queries to rebuild select list based on change in Palette selection.
+                    $('#sbPalette').change(function() {
+                        preDraw();        
+                    }); // Closes out Palette change function  
+
+                    // Calls preDraw function to print the page heading on initial page load
+                    preDraw();	
+                }
+
+                function preDraw() {
+                    selectedPalette = $('#sbPalette').val();   
+                    draw();
+                }
+    
+                function draw() { 
+                
+                    // define color schemes based on select list option
+                    var color;
+                    var mapStrokeColor = "#ced8d0";
+                    var mapTextColor = "#ffffff";
+                    var paletteDarkBlue = ["#000066","#003399","#0066cc","#0099ff"];
+                    var paletteLightBlue =["#eff3ff","#bdd7e7","#6baed6", "#3182bd"];
+                    var paletteBrown = ["#663311","#8a5711","#bc9c63","#df7500"];
+                    var paletteRedYellow = ["#ff0000","#ff3f00","#ff7e00","#ffbd00"];
+                    var paletteGray = ["#999999","#666666","#333333","#000000"];
+                    var paletteGreen = ["#8b7a32","#8e9431","#566727","#1d4504"];
+                    if (selectedPalette == "paletteDarkBlue") {
+                        color = paletteDarkBlue;
+                    }
+                    else if (selectedPalette == "paletteLightBlue") {
+                        color = paletteLightBlue;
+                        mapStrokeColor = "#000000"
+                        mapTextColor = "#000000";
+                    }
+                    else if (selectedPalette == "paletteBrown") {
+                        color = paletteBrown;
+                    }
+                    else if (selectedPalette == "paletteRedYellow") {
+                        color = paletteRedYellow;
+                    }
+                    else if (selectedPalette == "paletteGray") {
+                        color = paletteGray;
+                    }
+                    else {
+                        color = paletteGreen;  
+                    }
+ 
+                    $(".mapcontainer span").html("Please be patient. The map is loading.").css({"color":"blue", "font-weight":"bold"});
+                    
+                    // Inserts selected year into where clause in query and creates h1 and h2 headings
+
+                    $('h1').html('New York State Counties Map: Estimated Populations');                
+
+                    var arr = ["308171", "47736", "1438159", "197349", "78600", "78823", "132053", "87770", "49426", "81632", "62122", "49024", "46581", "296579", "922835", "38679", "51262", "54105", "59162", "47967", "4715", "63744", "119103", "2621793", "27220", "64586", "72369", "749857", "49779", "1358627", "1636268", "213525", "232871", "468196", "109707", "376099", "41984", "120913", "61128", "99487", "2321580", "159774", "473279", "323866", "224921", "155735", "31566", "18479", "34884", "98394", "111400", "1502968", "75943", "49870", "104691", "180445", "64973", "62372", "92051", "972634", "41188", "25208"];                        
+
+                        
+                        /**
+                         * @ Summary Draws this particular mapael map
+                         *
+                         * Some colors used in the fill attributes are taken from the 
+                         * color-hex palettes at http://www.color-hex.com/color-palettes/
+                         */
+            
+                        $(".mapcontainer").mapael({
+                            map: {
+                                name: "generic_nys_counties_map",
+                                
+                                defaultPlot: {
+                                    size: 4,
+                                    eventHandlers: {
+                                        mouseover: function (e, id, mapElem, textElem, elemOptions) {
+                                            if (typeof elemOptions.myText != 'undefined') {
+                                                $('.myText span').html(elemOptions.myText).css({display: 'none'}).fadeIn('slow');
+                                            }
+                                        }
+                                    }
+                                },
+                                
+                                defaultArea: {
+                                 
+                                    attrs: {
+                                        fill: "#f4f7c3",
+                                        stroke: mapStrokeColor,
+                                        "stroke-width": 1
+                                    },
+                                    attrsHover: {
+                                        fill: "#face58"
+                                    },
+                                    text: {                                   
+                                        attrs: {
+                                           // fill: "#000000"
+                                            fill: mapTextColor
+                                        },
+                                        attrsHover: {
+                                            fill: "#020202"
+                                        }
+                                    }
+                                },
+                                
+                                zoom: {
+                                    enabled: true,
+                                    maxLevel: 50
+                                }                            
+                            },
+                            
+                            legend: {
+                                area: {
+                                    mode: "horizontal", // runs legend horizontally
+                                    title: "Total Population within County",
+                              
+                                    // The exclusive attribute determines if clicking on a legend slice
+                                    // highlights that slice on the map and de-highlights all the
+                                    // other highlights. If not true (the default is false), the legend
+                                    // clicks will work as toggles, click once to highlight, click again
+                                    // to turn highlight off. If you click different legend items in 
+                                    // succession with exclusive set to true, it will only highlight 
+                                    // the most recent slice clicked. 
+                                    exclusive: false,
+                                    slices: [
+                                        {
+                                            max: 50000,
+                                            attrs: {
+                                               fill: color[0] // first color in palette
+                                            },
+                                            label: "Less than 50,000",
+                                            clicked: false // determines if slice appears highlighted on initial screen display
+                                            // if set to false (default) the slice will be highlighted in its legend color
+                                            // it set to true, the slice will not be highlighted on initial display
+                                        },
+                                        {
+                                            min: 50000,
+                                            max: 200000,
+                                            attrs: {
+                                                fill: color[1] // second color in palette
+                                            },
+                                            label: "Between 50,000 and 200,000",
+                                            clicked: false
+                                            
+                                        },
+                                        {
+                                            min: 200000,
+                                            max: 1000000,
+                                            attrs: {
+                                                fill: color[2] // third color in palette
+                                            },
+                                            text: {
+                                                attrs: {
+                                              //  fill: "#000000"
+                                              }
+                                            },
+                                            label: "Between 200,000 and 1,000,000",
+                                            clicked: false
+                                        },
+                                        {
+                                            min: 1000000,
+                                            attrs: {
+                                                fill: color[3] // fourth color in palette
+                                            },
+                                            label: "More than 1,000,000",
+                                            clicked: false
+                                        }
+                                    ]
+                                } // close out area attributes for legend
+                            },  // close out legend attributes
+                            
+                            
+                            areas: {
+                                "Albany": {
+                                    value: arr[0],
+                                    href: "#",
+                                    text: {content: "Albany", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Albany</span><hr>Population : "+replaceNumberWithCommas(arr[0])+""}
+                                },
+                                "Allegany": {
+                                    value: arr[1],
+                                    href: "#",
+                                    text: {content: "Allegany", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Allegany</span><hr>Population : "+replaceNumberWithCommas(arr[1])+""}
+                                },
+                                "Bronx": {
+                                    value: arr[2],
+                                    href: "#",
+                                    text: {content: "Broome", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Bronx</span><hr>Population : "+replaceNumberWithCommas(arr[2])+""}
+                                },
+                                "Broome": {
+                                    value: arr[3],
+                                    href: "#",
+                                    text: {content: "Broome", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Broome</span><hr>Population : "+replaceNumberWithCommas(arr[3])+""}
+                                },
+                                "Cattaraugus": {
+                                    value: arr[4],
+                                    href: "#",
+                                    text: {content: "Cattaraugus", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Cattaraugus</span><hr>Population : "+replaceNumberWithCommas(arr[4])+""}
+                                },
+                                "Cayuga": {
+                                    value: arr[5],
+                                    href: "#",
+                                    text: {content: "Cayuga", attrs: {"font-size": 6, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Cayuga</span><hr>Population : "+replaceNumberWithCommas(arr[5])+""}
+                                },
+                                "Chautauqua": {
+                                    value: arr[6],
+                                    href: "#",
+                                    text: {content: "Chautauqua", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Chautauqua</span><hr>Population : "+replaceNumberWithCommas(arr[6])+""}
+                                },
+                                "Chemung": {
+                                    value: arr[7],
+                                    href: "#",
+                                    text: {content: "Chemung", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Chemung</span><hr>Population : "+replaceNumberWithCommas(arr[7])+""}
+                                },
+                                "Chenango": {
+                                    value: arr[8],
+                                    href: "#",
+                                    text: {content: "Chenango", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Chenango</span><hr>Population : "+replaceNumberWithCommas(arr[8])+""}
+                                },
+                                "Clinton": {
+                                    value: arr[9],
+                                    href: "#",
+                                    text: {content: "Clinton", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Clinton </span><hr>Population : "+replaceNumberWithCommas(arr[9])+""}
+                                },
+                                "Columbia": {
+                                    value: arr[10],
+                                    href: "#",
+                                    text: {content: "Columbia", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Columbia</span><hr>Population : "+replaceNumberWithCommas(arr[10])+""}
+                                },
+                                "Cortland": {
+                                    value: arr[11],
+                                    href: "#",
+                                     text: {content: "Cortland", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Cortland</span><hr>Population : "+replaceNumberWithCommas(arr[11])+""}
+                                },
+                                "Delaware": {
+                                    value: arr[12],
+                                    href: "#",
+                                    text: {content: "Delaware", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Delaware</span><hr>Population : "+replaceNumberWithCommas(arr[12])+""}
+                                },
+                                "Dutchess": {
+                                    value: arr[13],
+                                    href: "#",
+                                    text: {content: "Dutchess", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Dutchess</span><hr>Population : "+replaceNumberWithCommas(arr[13])+""}
+                                },
+                                "Erie": {
+                                    value: arr[14],
+                                    href: "#",
+                                    text: {content: "Erie", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Erie</span><hr>Population : "+replaceNumberWithCommas(arr[14])+""}
+                                },
+                                "Essex": {
+                                    value: arr[15],
+                                    href: "#",
+                                    text: {content: "Essex", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Essex </span><hr>Population : "+replaceNumberWithCommas(arr[15])+""}
+                                },
+                                "Franklin": {
+                                    value: arr[16],
+                                    href: "#",
+                                    text: {content: "Franklin", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Franklin</span><hr>Population : "+replaceNumberWithCommas(arr[16])+""}
+                                },
+                                "Fulton": {
+                                    value: arr[17],
+                                    href: "#",
+                                    text: {content: "Fulton", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Fulton </span><hr>Population : "+replaceNumberWithCommas(arr[17])+""}
+                                },
+                                "Genesee": {
+                                    value: arr[18],
+                                    href: "#",
+                                    text: {content: "Genesee", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Genesee</span><hr>Population : "+replaceNumberWithCommas(arr[18])+""}
+                                },
+                                 "Greene": {
+                                    value: arr[19],
+                                    href: "#",
+                                    text: {content: "Greene", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Greene</span><hr>Population : "+replaceNumberWithCommas(arr[19])+""}
+                                },
+                                "Hamilton": {
+                                    value: arr[20],
+                                    href: "#",
+                                    text: {content: "Hamilton", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Hamilton </span><hr>Population : "+replaceNumberWithCommas(arr[20])+""}
+                                },
+                                "Herkimer": {
+                                    value: arr[21],
+                                    href: "#",
+                                    text: {content: "Herkimer", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Herkimer </span><hr>Population : "+replaceNumberWithCommas(arr[21])+""}
+                                },
+                                "Jefferson": {
+                                    value: arr[22],
+                                    href: "#",
+                                    text: {content: "Jefferson", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Jefferson</span><hr>Population : "+replaceNumberWithCommas(arr[22])+""}
+                                },
+                                "Kings": {
+                                    value: arr[23],
+                                    href: "#",
+                                    text: {content: "Kings", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Kings</span><hr>Population : "+replaceNumberWithCommas(arr[23])+""}
+                                },
+                                "Lewis": {
+                                    value: arr[24],
+                                    href: "#",
+                                    text: {content: "Lewis", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Lewis </span><hr>Population : "+replaceNumberWithCommas(arr[24])+""}
+                                },
+                                "Livingston": {
+                                    value: arr[25],
+                                    href: "#",
+                                    text: {content: "Livingston", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Livingston</span><hr>Population : "+replaceNumberWithCommas(arr[25])+""}
+                                },
+                                "Madison": {
+                                    value: arr[26],
+                                    href: "#",
+                                    text: {content: "Madison", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Madison</span><hr>Population : "+replaceNumberWithCommas(arr[26])+""}
+                                },
+                                "Monroe": {
+                                    value: arr[27],
+                                    href: "#",
+                                    text: {content: "Monroe", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Monroe</span><hr>Population : "+replaceNumberWithCommas(arr[27])+""}
+                                },
+                                "Montgomery": {
+                                    value: arr[28],
+                                    href: "#",
+                                    text: {content: "Montgomery", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Montgomery</span><hr>Population : "+replaceNumberWithCommas(arr[28])+""}
+                                },
+                                "Nassau": {
+                                    value: arr[29],
+                                    href: "#",
+                                    text: {content: "Nassau", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Nassau</span><hr>Population : "+replaceNumberWithCommas(arr[29])+""}
+                                },
+                                "New York": {
+                                    value: arr[30],
+                                    href: "#",
+                                    text: {content: "New York", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">New York</span><hr>Population : "+replaceNumberWithCommas(arr[30])+""}
+                                },
+                                "Niagara": {
+                                    value: arr[31],
+                                    href: "#",
+                                    text: {content: "Niagara", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Niagara</span><hr>Population : "+replaceNumberWithCommas(arr[31])+""}
+                                },
+                                "Oneida": {
+                                    value: arr[32],
+                                    href: "#",
+                                    text: {content: "Oneida", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Oneida</span><hr>Population : "+replaceNumberWithCommas(arr[32])+""}
+                                },
+                                "Onondaga": {
+                                    value: arr[33],
+                                    href: "#",
+                                    text: {content: "Onondago", attrs: {"font-size": 6, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Onondaga</span><hr>Population : "+replaceNumberWithCommas(arr[33])+""}
+                                },
+                                "Ontario": {
+                                    value: arr[34],
+                                    href: "#",
+                                    text: {content: "Ontario", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Ontario</span><hr>Population : "+replaceNumberWithCommas(arr[34])+""}
+                                },
+                                "Orange": {
+                                    value: arr[35],
+                                    href: "#",
+                                    text: {content: "Orange", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Orange</span><hr>Population : "+replaceNumberWithCommas(arr[35])+""}
+                                },
+                                "Orleans": {
+                                    value: arr[36],
+                                    href: "#",
+                                    text: {content: "Orleans", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Orleans</span><hr>Population : "+replaceNumberWithCommas(arr[36])+""}
+                                },
+                                "Oswego": {
+                                    value: arr[37],
+                                    href: "#",
+                                    text: {content: "Oswego", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Oswego</span><hr>Population : "+replaceNumberWithCommas(arr[37])+""}
+                                },
+                                "Otsego": {
+                                    value: arr[38],
+                                    href: "#",
+                                    text: {content: "Otsego", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Otsego</span><hr>Population : "+replaceNumberWithCommas(arr[38])+""}
+                                },
+                                "Putnam": {
+                                    value: arr[39],
+                                    href: "#",
+                                    text: {content: "Putnam", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Putnam</span><hr>Population : "+replaceNumberWithCommas(arr[39])+""}
+                                },
+                                "Queens": {
+                                    value: arr[40],
+                                    href: "#",
+                                    text: {content: "Queens", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Queens</span><hr>Population : "+replaceNumberWithCommas(arr[40])+""}
+                                },
+                                 "Rensselaer": {
+                                    value: arr[41],
+                                    href: "#",
+                                    text: {content: "Rensselaer", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Rensselaer</span><hr>Population : "+replaceNumberWithCommas(arr[41])+""}
+                                },
+                                "Richmond": {
+                                    value: arr[42],
+                                    href: "#",
+                                    text: {content: "Richmond", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Richmond</span><hr>Population : "+replaceNumberWithCommas(arr[42])+""}
+                                },
+                                "Rockland": {
+                                    value: arr[43],
+                                    href: "#",
+                                    text: {content: "Rockland", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Rockland</span><hr>Population : "+replaceNumberWithCommas(arr[43])+""}
+                                },
+                                "Saratoga": {
+                                    value: arr[44],
+                                    href: "#",
+                                    text: {content: "Saratoga ", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Saratoga</span><hr>Population : "+replaceNumberWithCommas(arr[44])+""}
+                                },
+                                "Schenectady": {
+                                    value: arr[45],
+                                    href: "#",
+                                    text: {content: "Schenectady", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Schenectady</span><hr>Population : "+replaceNumberWithCommas(arr[45])+""}
+                                },
+                                "Schoharie": {
+                                    value: arr[46],
+                                    href: "#",
+                                    text: {content: "Schoharie", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Schoharie</span><hr>Population : "+replaceNumberWithCommas(arr[46])+""}
+                                },
+                                "Schuyler": {
+                                    value: arr[47],
+                                    href: "#",
+                                    text: {content: "Schuyler", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Schuyler</span><hr>Population : "+replaceNumberWithCommas(arr[47])+""}
+                                },
+                                "Seneca": {
+                                    value: arr[48],
+                                    href: "#",
+                                    text: {content: "Seneca", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Seneca</span><hr>Population : "+replaceNumberWithCommas(arr[48])+""}
+                                },
+                                "Steuben": {
+                                    value: arr[49],
+                                    href: "#",
+                                    text: {content: "Steuben", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Steuben</span><hr>Population : "+replaceNumberWithCommas(arr[49])+""}
+                                },
+                                "St Lawrence": {
+                                    value: arr[50],
+                                    href: "#",
+                                    text: {content: "St. Lawrence", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">St Lawrence</span><hr>Population : "+replaceNumberWithCommas(arr[50])+""}
+                                },
+                                "Suffolk": {
+                                    value: arr[51],
+                                    href: "#",
+                                    text: {content: "Suffolk", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Suffolk</span><hr>Population : "+replaceNumberWithCommas(arr[51])+""}
+                                },
+                                "Sullivan": {
+                                    value: arr[52],
+                                    href: "#",
+                                    text: {content: "Sullivan", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Sullivan</span><hr>Population : "+replaceNumberWithCommas(arr[52])+""}
+                                },
+                                "Tioga": {
+                                    value: arr[53],
+                                    href: "#",
+                                    text: {content: "Tioga", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Tioga</span><hr>Population : "+replaceNumberWithCommas(arr[53])+""}
+                                },
+                                "Tompkins": {
+                                    value: arr[54],
+                                    href: "#",
+                                    text: {content: "Tompkins", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Tompkins</span><hr>Population : "+replaceNumberWithCommas(arr[54])+""}
+                                },
+                                "Ulster": {
+                                    value: arr[55],
+                                    href: "#",
+                                    text: {content: "Ulster", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Ulster</span><hr>Population : "+replaceNumberWithCommas(arr[55])+""}
+                                },
+                                "Warren": {
+                                    value: arr[56],
+                                    href: "#",
+                                    text: {content: "Warren", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Warren</span><hr>Population : "+replaceNumberWithCommas(arr[56])+""}
+                                },
+                                "Washington": {
+                                    value: arr[57],
+                                    href: "#",
+                                    text: {content: "Washington", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Washington</span><hr>Population : "+replaceNumberWithCommas(arr[57])+""}
+                                },
+                                "Wayne": {
+                                    value: arr[58],
+                                    href: "#",
+                                    text: {content: "Wayne", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Wayne</span><hr>Population : "+replaceNumberWithCommas(arr[58])+""}
+                                },
+                                "Westchester": {
+                                    value: arr[59],
+                                    href: "#",
+                                    text: {content: "West-Chester", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">West-Chester</span><hr>Population : "+replaceNumberWithCommas(arr[59])+""}
+                                },
+                                "Wyoming": {
+                                    value: arr[60],
+                                    href: "#",
+                                    text: {content: "Wyoming", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Wyoming </span><hr>Population : "+replaceNumberWithCommas(arr[60])+""}
+                                },
+                                "Yates": {
+                                    value: arr[61],
+                                    href: "#",
+                                    text: {content: "Yates", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Yates</span><hr>Population : "+replaceNumberWithCommas(arr[61])+""}
+                                }                           
+                           }  // close out areas of individual counties
+                        }); // close out $(".mapcontainer").mapael)
+
+                        
+                } // close out draw function
+                
+                /**
+                 * @summary Formats numbers to insert comma every 3 digits to left of decimal
+                 * Found on stackoverflow at:     
+                 * http://stackoverflow.com/questions/14075014/jquery-function-to-to-format-number-with-commas-and-decimal
+                 */
+                function replaceNumberWithCommas(yourNumber) {
+                    //Seperates the components of the number
+                    var n = yourNumber.toString().split(".");
+                    //Comma-fies the first part
+                    n[0] = n[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    //Combines the two sections
+                    return n.join(".");
+                }
+          
+            }); // close out containing closure function
+            
+        </script>
+    </head>
+
+    <body>
+        <h1></h1>
+        <div id="links" style="margin-top:-30px;float:right"> &lt; <a href="maps.html">Back to Portal Page</a></div>
+        <fieldset style="clear:both;;margin-bottom: 12px; background-color: #f2f2f2">
+            <legend>Filter map by colors</legend>
+            <span id="return"/>
+        </fieldset>
+
+        <div class="container">
+            <div class="myText">Move your cursor over any county to see its estimated total population.<br/>Click any range from the legend below to shade out the counties on the map within that range. Click it again to refocus those counties.
+            </div>
+
+            <div class="mapcontainer">
+                <div class="areaLegend myText2">
+                    <span>Alternative content for the legend</span>
+                </div>
+                <div class="map">
+                    <span>Alternative content for the map</span>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>

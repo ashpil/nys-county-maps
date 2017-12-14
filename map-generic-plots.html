@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>NYS Counties With Plot Points for Some City Halls</title>
+        
+        <link rel="stylesheet" href="css/generic-styles.css"></link>
+        <link rel="stylesheet" href="css/generic-map-styles.css"></link>
+        <link rel="stylesheet" href="css/generic-print-styles.css"></link>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.0/raphael-min.js" charset="utf-8"></script>
+
+        <script src="js/maps/jquery.mapael.js" charset="utf-8"></script>
+        <script src="js/maps/generic_nys_counties_map.js" charset="utf-8"></script>
+        
+        <style>
+            circle {
+                fill: #000;
+                }
+        </style>
+        
+        <script type="text/javascript">
+        
+            // selected options from select lists for Population
+            var selectedPalette; 
+
+            // labels for select listfor Population
+            var lblPalette = $('<label for="sbPalette">Select Map Colors: </label>');
+
+            // initializes indexes for select list to 0
+            var paletteIndex = 0;
+
+            // sets default index for each select list on initial page load
+            var paletteIndex2 = 0;
+
+            // wrap Javascript in anonymous function for closure
+            $(function () {		
+            
+            // Creates palette array for select list  
+                    paletteArray = ["paletteBlue", "Blue", "paletteYellow", "Yellow", "paletteGreen", "Green", "paletteBrown", "Brown", "paletteRed", "Red", "paletteGray", "Gray"];
+                    
+                    createSelectList(paletteArray, "sbPalette");
+                    
+                    $('#sbPalette').prop('selectedIndex', paletteIndex2);
+                    selectedPalette = $('#sbPalette').val();
+                    
+                      // call initializePage function
+                    initializePage();
+            
+            function createSelectList (sBoxElements, sbID) {
+    
+                    // Create the selection element.
+                    var sel = $('<select class="sBoxes" id="'+sbID+'"></select>');
+
+                    // loops through the array of options.
+                    for (index = 0; index < sBoxElements.length; index += 2) {
+                        // Append the option to the selection box.
+                        sel.append('<option value='+sBoxElements[index]+'>'+sBoxElements[index+1]+'</option>');
+                    }
+
+                    // Append the selection box to the correct position within fieldset.
+                    $(sel).insertAfter('legend');
+                }
+
+                function initializePage() {	
+
+                    // Builds top of page with select lists and labels
+                    $(lblPalette).insertBefore('#sbPalette');
+
+                    // Re-queries to rebuild select list based on change in Palette selection.
+                    $('#sbPalette').change(function() {
+                        preDraw();        
+                    }); // Closes out Palette change function  
+
+                    // Calls preDraw function to print the page heading on initial page load
+                    preDraw();	
+                }
+
+                function preDraw() {
+                    selectedPalette = $('#sbPalette').val();   
+                    draw();
+                }
+    
+                function draw() { 
+                
+                    // define color schemes based on select list option
+                    var color;
+                    var mapStrokeColor = "#ced8d0";
+                    var mapTextColor = "#ffffff";
+                    var paletteYellow = ["#f4f7c3"];
+                    var paletteBlue =["#bdd7e7"];
+                    var paletteBrown = ["#8a5711"];
+                    var paletteRed = ["#ff3f00"];
+                    var paletteGray = ["#999999"];
+                    var paletteGreen = ["#8e9431"];
+                    if (selectedPalette == "paletteYellow") {
+                        color = paletteYellow;
+                        mapStrokeColor = "#000000"
+                        mapTextColor = "#000000";
+                    }
+                    else if (selectedPalette == "paletteBlue") {
+                        color = paletteBlue;
+                        mapStrokeColor = "#000000"
+                        mapTextColor = "#000000";
+                    }
+                    else if (selectedPalette == "paletteBrown") {
+                        color = paletteBrown;
+                    }
+                    else if (selectedPalette == "paletteRed") {
+                        color = paletteRed;
+                    }
+                    else if (selectedPalette == "paletteGray") {
+                        color = paletteGray;
+                    }
+                    else if (selectedPalette == "paletteGreen") {
+                    color = paletteGreen;
+                    }
+                    else {
+                        color = paletteBlue;  
+                    }              
+                    
+                    $(".mapcontainer span").html("Please be patient. The map is loading.").css({"color":"blue", "font-weight":"bold"});
+                    
+                    // Inserts selected year into where clause in query and creates h1 and h2 headings
+
+                    $('h1').html('New York State Counties Map: NYS Counties With Plot Points for Some City Halls'); 
+ 
+
+                        // Create map
+                        $maparea2 = $(".mapcontainer").mapael({
+                            map: {
+                                name: "generic_nys_counties_map", 
+                                defaultPlot: {size: 4,
+                                    eventHandlers: {
+                                        mouseover: function (e, id, mapElem, textElem, elemOptions) {
+                                            if (typeof elemOptions.myText != 'undefined') {
+                                                $('.myText').html(elemOptions.myText).css({display: 'block'}).fadeIn('slow'); // changed .css({display: ) to 'block' to eliminate shift in map when hovering, when .css({display: ) was set to 'none', the hover shifted the map
+                                            }
+                                        }
+                                    }
+                                }, 
+                                zoom: {
+                                    enabled: true,
+                                    maxLevel: 50
+                                },
+                                // Set default plots and areas style
+                                defaultArea: {
+                                    attrs: {
+                                          fill: color,
+                                          stroke: mapStrokeColor,
+                                          "stroke-width": 1
+                                    },
+                                    attrsHover: {
+ //                                       fill: "#a4e100"
+                                          fill: "#face58"
+                                    },
+                                    text: {
+                                        attrs: {
+                            //                fill: "#505444"
+                                            fill: mapTextColor
+                                        },
+                                        attrsHover: {
+                        //                    fill: "#000"
+                                            fill: "#020202"
+                                        }
+                                    }
+                                }
+                            },
+
+                            areas: {
+                                "Albany": {
+                                    text: {content: "Albany", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                
+                                "Allegany": {
+                                    text: {content: "Allegany", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Bronx": {
+                                    text: {content: "Broome", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Broome": {
+                                    text: {content: "Broome", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Cattaraugus": {
+                                    text: {content: "Cattaraugus", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Cayuga": {
+                                    text: {content: "Cayuga", attrs: {"font-size": 6, "font-weight": "bold"}},
+                                },
+                                "Chautauqua": {
+                                    text: {content: "Chautauqua", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Chemung": {
+                                    text: {content: "Chemung", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Chenango": {
+                                    text: {content: "Chenango", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Clinton": {
+                                    text: {content: "Clinton", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Columbia": {
+                                    text: {content: "Columbia", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Cortland": {
+                                     text: {content: "Cortland", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Delaware": {
+                                    text: {content: "Delaware", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Dutchess": {
+                                    text: {content: "Dutchess", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Erie": {
+                                    text: {content: "Erie", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Essex": {
+                                    text: {content: "Essex", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Franklin": {
+                                    text: {content: "Franklin", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Fulton": {
+                                    text: {content: "Fulton", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Genesee": {
+                                    text: {content: "Genesee", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                 "Greene": {
+                                    text: {content: "Greene", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Hamilton": {
+                                    text: {content: "Hamilton", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Herkimer": {
+                                    text: {content: "Herkimer", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Jefferson": {
+                                    text: {content: "Jefferson", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Kings": {
+                                    text: {content: "Kings", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Lewis": {
+                                    text: {content: "Lewis", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Livingston": {
+                                    text: {content: "Livingston", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Madison": {
+                                    text: {content: "Madison", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Monroe": {
+                                    text: {content: "Monroe", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Montgomery": {
+                                    text: {content: "Montgomery", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Nassau": {
+                                    text: {content: "Nassau", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "New York": {
+                                    text: {content: "New York", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Niagara": {
+                                    text: {content: "Niagara", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Oneida": {
+                                    text: {content: "Oneida", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Onondaga": {
+                                    text: {content: "Onondago", attrs: {"font-size": 6, "font-weight": "bold"}},
+                                },
+                                "Ontario": {
+                                    text: {content: "Ontario", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Orange": {
+                                    text: {content: "Orange", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Orleans": {
+                                    text: {content: "Orleans", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Oswego": {
+                                    text: {content: "Oswego", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Otsego": {
+                                    text: {content: "Otsego", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Putnam": {
+                                    text: {content: "Putnam", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Queens": {
+                                    text: {content: "Queens", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                 "Rensselaer": {
+                                    text: {content: "Rensselaer", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Richmond": {
+                                    text: {content: "Richmond", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Rockland": {
+                                    text: {content: "Rockland", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Saratoga": {
+                                    text: {content: "Saratoga ", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Schenectady": {
+                                    text: {content: "Schenectady", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Schoharie": {
+                                    text: {content: "Schoharie", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Schuyler": {
+                                    text: {content: "Schuyler", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Seneca": {
+                                    text: {content: "Seneca", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Steuben": {
+                                    text: {content: "Steuben", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "St Lawrence": {
+                                    text: {content: "St. Lawrence", attrs: {"font-size": 8, "font-weight": "bold"}},
+
+                                },
+                                "Suffolk": {
+                                    text: {content: "Suffolk", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Sullivan": {
+                                    text: {content: "Sullivan", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Tioga": {
+                                    text: {content: "Tioga", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Tompkins": {
+                                    text: {content: "Tompkins", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Ulster": {
+                                    text: {content: "Ulster", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Warren": {
+                                    text: {content: "Warren", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Washington": {
+                                    text: {content: "Washington", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Wayne": {
+                                    text: {content: "Wayne", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Westchester": {
+                                    text: {content: "West-Chester", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Wyoming": {
+                                    text: {content: "Wyoming", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                },
+                                "Yates": {
+                                    text: {content: "Yates", attrs: {"font-size": 8, "font-weight": "bold"}},
+                                }                          
+                           },  // close out areas of individual counties
+                            
+                            plots: {                                
+                                // Circle plot
+                                'buffalo': {
+                                    type: "circle",
+                                    size: 10,
+                                    latitude: 42.8865829,
+                                    longitude: -78.8815274,
+                                    tooltip: {content: "<span style=\"font-weight:bold;\"> Buffalo City Hall</span>"},
+                                   href: "https://www.google.com/maps/place/City+of+Buffalo/@42.8865829,-78.8815274,17z/data=!3m1!4b1!4m5!3m4!1s0x89d3124bb580f115:0xe73f8e5fb8c3c90f!8m2!3d42.8865829!4d-78.8793387"
+  //                               href: "https://maps.google.com/maps?q=65 Niagara Square,+Buffalo,+NY,+14202&z=10"
+                                }, // end buffalo
+                                // Circle plot
+                                'rochester': {
+                                    type: "circle",
+                                    size: 10,
+                                    latitude: 43.1569998,
+                                    longitude: -77.6171247,
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Rochester City Hall</span>"},
+                                    href: "https://www.google.com/maps/place/Rochester+City+Hall/@43.1569998,-77.6171247,17z/data=!3m1!4b1!4m5!3m4!1s0x89d6b456698d6e25:0x2f82407d648b1036!8m2!3d43.1569998!4d-77.614936"
+                                }, // end rochester
+                                // Circle plot
+                                'syracuse': {
+                                    type: "circle",
+                                    size: 10,
+                                    latitude: 43.0500445,
+                                    longitude: -76.1513069,
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Syracuse City Hall</span>"},
+                                    href: "https://www.google.com/maps/place/Syracuse+City+Hall/@43.0500445,-76.1513069,17z/data=!3m1!4b1!4m5!3m4!1s0x89d9f3ba261954d5:0x4cc7a48f9c974ef9!8m2!3d43.0500445!4d-76.1491182"
+  //                                href: "https://maps.google.com/maps?q=233 E Washington St,,+Syracuse,+NY,+13202&z=10"
+                                }, // end syracuse
+                                // Circle plot
+                                'albany': {
+                                    type: "circle",
+                                    size: 10,
+                                    latitude: 42.6518011,
+                                    longitude: -73.756651,
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Albany City Hall</span>"},
+                                    href: "https://www.google.com/maps/place/Albany+City+Hall/@42.6518011,-73.756651,17z/data=!3m1!4b1!4m5!3m4!1s0x89de0a25d16dd7cb:0x1f830175ce7451e5!8m2!3d42.6518011!4d-73.7544623"
+                                }, // end albany
+                                // Circle plot
+                                'yonkers': {
+                                    type: "circle",
+                                    size: 10,
+                                    latitude: 40.938384,
+                                    longitude: -73.9124998,
+                                    tooltip: {content: "<span style=\"font-weight:bold;\">Yonkers City Hall</span>"},
+                                    href: "https://www.google.com/maps/place/Yonkers+City+Hall/@40.938384,-73.9124998,13z/data=!4m8!1m2!2m1!1sYonkers+City+Hall!3m4!1s0x89c2f27ae310aa83:0x637a801c379651a4!8m2!3d40.9321376!4d-73.8979697"
+                                } // end yonkers
+                            }
+
+                            
+                            
+                        }); // close out $(".mapcontainer").mapael)
+                   
+
+         
+                } // close out draw function
+
+            }); // end document.ready
+        </script>
+
+    </head>
+
+    <body>
+
+        <h1></h1>
+        <div id="links" style="margin-top:-30px;float:right"> &lt; <a href="maps.html">Back to Portal Page</a></div>
+        <fieldset style="clear:both;;margin-bottom: 12px; background-color: #f2f2f2">
+            <legend>Filter map by colors</legend>
+            <span id="return"/>
+        </fieldset>
+        
+        <div class="container">
+            <div class="myText">Move your cursor over the points plotted on the map and click to go to a google map for that location.</div>
+            
+            <div class="mapcontainer">
+                <div class="map">
+                    <span>Alternative content for the map</span>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>
