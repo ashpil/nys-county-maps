@@ -1,134 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NYS County Outline Maps</title>
-  <!-- Bootstrap CSS CDN -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/font-awesome-4.7.0/css/font-awesome.min.css"></link>
-  <!-- Our Custom CSS -->
-  <link rel="stylesheet" href="css/generic-styles.css"></link>
-<style>   
-.contain {
-  width: 95%;
-  margin: auto;
-}
-.left3 {
-  width: 22.5%;
-  float: left;
-  padding: 1em;
-}
-.left {
-  width: 40%;
-  float: left;
-  padding: 1em;
-}
-.left-bar {
-  border-left: 1px solid black;
-  width: 40%;
-  float: left;
-  padding: 1em;
-}
-.center-arrow {
-  padding: 8em 1em 0 1em;
-  float:left;
-  width: 10%;
-}
-
-.break {
-  clear: both;
-  margin: 1em;
-  border-top: 1px solid black;
-}
-h1 {
-    margin-left:1em;
-    font-size:1.7em;
-    font-weight: bold;
-
-}
-.index-brief {
-    font-size:1.2em;
-    font-weight: bold;
-
-}
-.index-brief a {
-  text-decoration: none;
-}
-img {
- width: 100%; 
-}
-img#logo {
- width: 50%; 
-}
-.screen {
- border: 3px double red;
- border-radius: 15px;
- padding: 5px;
-}
-
-</style>
-</head>
-<body>
-<img id="logo" src="images/logo_ctg-compliant.jpg" alt="photo" style="margin:.5em 0em 1em 1em;">
-<h1>NYS County Outline Maps</h1>
-<p style="padding: 0 20px; font-size: 1.15em;">The sample maps below demonstrate interactive maps containing the outlines of the 62 counties in New York State. These maps can be used in combination with data sources to display information about counties and other areas within New York State, such as the population values given in the third sample below, or to pinpoint locations and click out to Google maps as shown in the fourth sample below. Unlike PDF, JPG, or other graphic versions of the New York State map, these maps are dynamic and can be used and re-used for a variety of purposes and continuously updated with current data. And because they are web-based and responsive, they will size appropriately to all devices from smartphones to big-screen monitors. </p> 
-
-
-<div class="contain">
-
-  <div class="left3">
-  <h3 class="index-brief">County Outline Map - Basic Shell</h3>
-  <a href="map-outlined.html"><img src="images/map-outlined.png" class="screen"></a>
-  </div>
-
-
-  
-  <div class="left3">
-  <h3 class="index-brief">County Outline Map with Labels</h3>
-  <a href="map-outlined-labels.html"><img src="images/map-outlined-labels.png" class="screen"></a>
-  </div>
-  
-
-  
-  <div class="left3">
-  <h3 class="index-brief">County Outline Map with Data</h3>
-  <a href="map-generic.html"><img src="images/map-generic.png" class="screen"></a>
-  </div>
-  
-  <div class="left3">
-  <h3 class="index-brief">County Outline Map with Plots</h3>
-  <a href="map-generic-plots.html"><img src="images/map-generic-plots.png" class="screen"></a>
-  </div>
-  
-
-    
-</div> 
-
- <p style="padding: 0 20px; font-size: 1.15em;font-style:italic; clear: both;">These maps were created using the New York Counties SVG file from Wikimedia Commons at <a href="https://commons.wikimedia.org/wiki/File:New_York_Counties.svg">https://commons.wikimedia.org/wiki/File:New_York_Counties.svg</a>. The svg file was then loaded into the jQuery Mapael "SVG to Mapael" converter at <a href="https://www.vincentbroute.fr/mapael/create-map.php">https://www.vincentbroute.fr/mapael/create-map.php</a> which generates the jQuery Mapael map file from the SVG file that contains the paths of the areas to retrieve. From that basis, individual data sets can be loaded into the map to display specific information of interest.</p> 
- 
- <div style="padding: 0 20px; font-size: 1em;font-style:italic; ">
- <ul style="margin-left:-24px;">
- <li>The New York Counties SVG file is licensed under the GNU Free Documentation License, Version 1.2 or any later version published by the Free Software Foundation <a href="https://en.wikipedia.org/wiki/GNU_Free_Documentation_License">https://en.wikipedia.org/wiki/GNU_Free_Documentation_License</a>. Copyright (C) André Koehne.</li>
- <li>jQuery Mapael is licensed under the MIT license (<a href="http://www.opensource.org/licenses/mit-license.php">http://www.opensource.org/licenses/mit-license.php</a>). Copyright (C) 2013-2017 Vincent Brouté.</li>
-
-</ul>
-</div>
-
-<p style="padding: 0 20px; font-size: 1.15em;">
-<!-- <a class="btn btn-social-icon btn-lg btn-github"><i class="fa fa-github"></i>&nbsp;Find Me on GitHub</a> -->
-You can also find the code for these maps on our GitHub Repository --> 
-<!-- <button type="button" class="btn btn-default btn-lg btn-github"><i class="fa fa-github"></i>  CTG on GitHub</button> -->
-<a href="https://github.com/CTGUAlbany/nys-county-maps" class="btn btn-primary btn-lg btn-github" role="button"><i class="fa fa-github"></i>  CTG on GitHub</a>
-</p>
-
-<!-- jQuery CDN -->
-         <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-         <!-- Bootstrap Js CDN -->
-         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-         <!-- jQuery Nicescroll CDN -->
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.6.8-fix/jquery.nicescroll.min.js"></script>
-
-
-</body>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>NYS County Outline Maps</title>
+        <!-- Bootstrap CSS CDN -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <!-- Font-Awesome icons -->
+        <link rel="stylesheet" href="css/font-awesome-4.7.0/css/font-awesome.min.css"></link>
+        <!-- Our Custom CSS -->
+        <link rel="stylesheet" href="css/generic-styles.css"></link>
+    </head>
+    <body>
+        <div class="container">   
+            <img id="logo" src="images/logo_ctg-compliant.jpg" alt="photo">
+            <h1>NYS County Outline Maps</h1>
+            <p>The sample maps below demonstrate interactive maps containing the outlines of the 62 counties in New York State. These maps can be used in combination with data sources to display information about counties and other areas within New York State, such as the population values given in the third sample below, or to pinpoint locations and click out to Google maps as shown in the fourth sample below. Unlike PDF, JPG, or other graphic versions of the New York State map, these maps are dynamic and can be used and re-used for a variety of purposes and continuously updated with current data. And because they are web-based and responsive, they will size appropriately to all devices from smartphones to big-screen monitors.</p> 
+            <div class="row">
+                <div class="col-md-3">
+                    <h2>County Outline Map - Basic Shell</h2>
+                    <a href="map-outlined.html"><img src="images/map-outlined.png" class="screen"></a>
+                </div>
+                <div class="col-md-3">
+                    <h2>County Outline Map with Labels</h2>
+                    <a href="map-outlined-labels.html"><img src="images/map-outlined-labels.png" class="screen"></a>
+                </div>
+                <div class="col-md-3">
+                    <h2>County Outline Map with Data</h2>
+                    <a href="map-generic.html"><img src="images/map-generic.png" class="screen"></a>
+                </div>
+                <div class="col-md-3">
+                    <h2>County Outline Map with Plots</h2>
+                    <a href="map-generic-plots.html"><img src="images/map-generic-plots.png" class="screen"></a>
+                </div> 
+            </div> 
+            <div class="row">&nbsp;</div>       
+            <p class="italic">These maps were created using the New York Counties SVG file from Wikimedia Commons at <a href="https://commons.wikimedia.org/wiki/File:New_York_Counties.svg">https://commons.wikimedia.org/wiki/File:New_York_Counties.svg</a>. The svg file was then loaded into the jQuery Mapael "SVG to Mapael" converter at <a href="https://www.vincentbroute.fr/mapael/create-map.php">https://www.vincentbroute.fr/mapael/create-map.php</a> which generates the jQuery Mapael map file from the SVG file that contains the paths of the areas to retrieve. From that basis, individual data sets can be loaded into the map to display specific information of interest.</p> 
+            <ul class="italic">
+                <li>The New York Counties SVG file is licensed under the GNU Free Documentation License, Version 1.2 or any later version published by the Free Software Foundation <a href="https://en.wikipedia.org/wiki/GNU_Free_Documentation_License">https://en.wikipedia.org/wiki/GNU_Free_Documentation_License</a>. Copyright (C) André Koehne.</li>
+                <li>jQuery Mapael is licensed under the MIT license (<a href="http://www.opensource.org/licenses/mit-license.php">http://www.opensource.org/licenses/mit-license.php</a>). Copyright (C) 2013-2017 Vincent Brouté.</li>
+            </ul>
+            <p>You can also find the code for these maps on our GitHub Repository --><a href="https://github.com/CTGUAlbany/nys-county-maps" class="btn btn-primary btn-lg btn-github" role="button"><i class="fa fa-github"></i>CTG on GitHub</a>
+            <!-- Alternate Ways to Display GitHub Link with icon or button -->
+            <!-- <a href="https://github.com/CTGUAlbany/nys-county-maps" <button type="button" class="btn btn-default btn-lg btn-github"><i class="fa fa-github"></i>  CTG on GitHub</button></a> -->
+            <!-- <a href="https://github.com/CTGUAlbany/nys-county-maps" class="btn btn-social-icon btn-lg btn-github"><i class="fa fa-github"></i>&nbsp;CTG on GitHub</a> --></p>        
+        </div> <!-- close out container -->
+        <!-- jQuery CDN -->
+        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+        <!-- Bootstrap Js CDN -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <!-- jQuery Nicescroll CDN -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.6.8-fix/jquery.nicescroll.min.js"></script>
+    </body>
 </html>

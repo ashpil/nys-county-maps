@@ -83,14 +83,14 @@
   padding: 10px;
   color: #fff;
   overflow: auto;
+  font-size: 0.9em;
 }
-
 .myText2 {
   background-color: #e6faff;
   height: 50px;
   padding: 10px;
 }
-
-.myText2 svg {
-  background-color: #e6faff;
+/* Size of circle for plots on map */
+circle {
+  fill: #000;
 }

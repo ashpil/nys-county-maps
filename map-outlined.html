@@ -16,10 +16,10 @@
         
         <script type="text/javascript">
 
-            // selected options from select lists for Population
+            // selected options from select lists for Color Palette
             var selectedPalette; 
 
-            // labels for select listfor Population
+            // labels for select list for Color Palette
             var lblPalette = $('<label for="sbPalette">Select Map Colors: </label>');
 
             // initializes indexes for select list to 0
@@ -31,19 +31,22 @@
             // wrap Javascript in anonymous function for closure
             $(function () {		
             
-            // Creates palette array for select list  
-                    paletteArray = ["paletteLightBlue", "LightBlue", "paletteDarkBlue", "DarkBlue", "paletteGreen", "Green", "paletteBrown", "Brown", "paletteRed", "Red", "paletteYellow", "Yellow", "paletteGray", "Gray"];
-                    
-                    createSelectList(paletteArray, "sbPalette");
-                    
-                    $('#sbPalette').prop('selectedIndex', paletteIndex2);
-                    selectedPalette = $('#sbPalette').val();
-                    
-                      // call initializePage function
-                    initializePage();
+                // Creates palette array for select list  
+                paletteArray = ["paletteLightBlue", "LightBlue", "paletteDarkBlue", "DarkBlue", "paletteGreen", "Green", "paletteBrown", "Brown", "paletteRed", "Red", "paletteYellow", "Yellow", "paletteGray", "Gray"];
+                
+                // assigns initial default value to selectedPalette
+                $('#sbPalette').prop('selectedIndex', paletteIndex2);
+                selectedPalette = $('#sbPalette').val();
+                
+                // call CreateSelectList function
+                createSelectList(paletteArray, "sbPalette");
+
+                // call initializePage function
+                initializePage();
             
-            function createSelectList (sBoxElements, sbID) {
-    
+                // Creates the select list for the Color Palette
+                function createSelectList (sBoxElements, sbID) {
+
                     // Create the selection element.
                     var sel = $('<select class="sBoxes" id="'+sbID+'"></select>');
 
@@ -55,8 +58,10 @@
 
                     // Append the selection box to the correct position within fieldset.
                     $(sel).insertAfter('legend');
-                }
+                    
+                } // close out createSelectList function
 
+                // Prepares for page display
                 function initializePage() {	
 
                     // Builds top of page with select lists and labels
@@ -64,19 +69,19 @@
 
                     // Re-queries to rebuild select list based on change in Palette selection.
                     $('#sbPalette').change(function() {
-                        preDraw();        
+                        draw();        
                     }); // Closes out Palette change function  
 
-                    // Calls preDraw function to print the page heading on initial page load
-                    preDraw();	
-                }
-
-                function preDraw() {
-                    selectedPalette = $('#sbPalette').val();   
+                    // Calls draw function to display the page 
                     draw();
-                }
+                    
+                } // close out initializePage function
     
+                // Draws and displays the page
                 function draw() { 
+                
+                    // assigns selectedPalette variable to value form select list
+                    selectedPalette = $('#sbPalette').val();
                 
                     // define color schemes based on select list option
                     var color;
@@ -112,62 +117,45 @@
                     else {
                         color = paletteYellow;  
                     }
- 
-                    
-                    // Inserts selected year into where clause in query and creates h1 and h2 headings
-
+                     
+                    // Creates h1 page heading
                     $('h1').html('New York State Map: Counties Outlined');                                       
-
-                        
-                        /**
-                         * @ Summary Draws this particular mapael map
-                         *
-                         * Some colors used in the fill attributes are taken from the 
-                         * color-hex palettes at http://www.color-hex.com/color-palettes/
-                         */
-            
-                        $(".mapcontainer").mapael({
-                            map: {
-                                name: "generic_nys_counties_map",
-                                
-                                defaultPlot: {
-                                    size: 4,
-                                    eventHandlers: {
-                                        mouseover: function (e, id, mapElem, textElem, elemOptions) {
-                                            if (typeof elemOptions.myText != 'undefined') {
-                                                $('.myText span').html(elemOptions.myText).css({display: 'none'}).fadeIn('slow');
-                                            }
-                                        }
-                                    }
+                       
+                    /**
+                     * @ Summary Draws this particular mapael map
+                     *
+                     * Some colors used in the fill attributes are taken from the 
+                     * color-hex palettes at http://www.color-hex.com/color-palettes/
+                     */
+        
+                    $(".mapcontainer").mapael({
+                        map: {
+                            name: "generic_nys_counties_map", // references the nys county mapael map
+                            
+                            defaultArea: {
+                             
+                                attrs: {
+                                    fill: color,
+                                    stroke: mapStrokeColor,
+                                    "stroke-width": 1
                                 },
-                                
-                                defaultArea: {
-                                 
+                                text: {                                   
                                     attrs: {
-                                        fill: color,
-                                        stroke: mapStrokeColor,
-                                        "stroke-width": 1
+                                        fill: mapTextColor
                                     },
-                                    text: {                                   
-                                        attrs: {
-                                            fill: mapTextColor
-                                        },
-                                    }
-                                },
-                                
-                                zoom: {
-                                    enabled: true,
-                                    maxLevel: 50
-                                }                            
+                                }
                             },
-                                                      
-                        }); // close out $(".mapcontainer").mapael)
-
-                        
+                            
+                            zoom: {
+                                enabled: true,
+                                maxLevel: 50
+                            }                            
+                        },
+                                                  
+                    }); // close out $(".mapcontainer").mapael)
+            
                 } // close out draw function
                 
-
-          
             }); // close out containing closure function
             
         </script>
@@ -175,17 +163,12 @@
 
     <body>
         <h1></h1>
-        <div id="links" style="margin-top:-30px;float:right"> &lt; <a href="maps.html">Back to Portal Page</a></div>
-        <fieldset style="clear:both;;margin-bottom: 12px; background-color: #f2f2f2">
+        <div id="links"> &lt; <a href="maps.html">Back to Portal Page</a></div>
+        <fieldset>
             <legend>Filter map by colors</legend>
-            <span id="return"/>
         </fieldset>
-
         <div class="container">
-
-
             <div class="mapcontainer">
-
                 <div class="map">
                     <span>Alternative content for the map</span>
                 </div>

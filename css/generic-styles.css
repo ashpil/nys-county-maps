@@ -6,29 +6,27 @@ body {
   font-family: Arial, Tahoma, Geneva, sans-serif;
   line-height: 16px;
 }
-.contain {
-  width: 95%;
-  margin: auto;
-}
-.left3 {
-  width: 22.5%;
-  float: left;
-  padding: 1em;
-}
 h1 {
-  margin-left:1em;
-  font-size:1.7em;
+  font-size:1.5em;
   font-weight: bold;
 }
-.index-brief {
-  font-size:1.2em;
+h2 {
+  font-size:1.3em;
   font-weight: bold;
 }
-.index-brief a {
-  text-decoration: none;
+.italic {
+  font-style:italic;
+}
+p, div, ul{
+  font-size: 1.1em;
+  line-height: 1.4em;
+}
+ul {
+  margin-left:-24px;
 }
 img {
  width: 100%; 
+ padding-top: 1em;
 }
 img#logo {
  width: 50%; 
@@ -37,6 +35,18 @@ img#logo {
  border: 3px double red;
  border-radius: 15px;
  padding: 5px;
+}
+/* ==========================================================================
+   General Styles on Map Display Pages 
+   ========================================================================== */
+fieldset {
+  clear:both;
+  margin-bottom: 12px;
+  background-color: #f2f2f2;
+}
+#links {
+  margin-top:-30px;
+  float: right;
 }
 
 
